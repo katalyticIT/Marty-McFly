@@ -1,9 +1,168 @@
-<html>
+<!DOCTYPE html>
+<html lang="de">
 <head>
-  <title>Marty McFly demo application</title>
-  <link rel="stylesheet" href="/static/styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="ai-generated" content="all">
+    <meta name="ai-generated-hr" content="Nearly all content was created using Google Gemini 3 Flash. Some minor details in the design were manually readjusted.">
+    <meta name="description" content="This page displays the local (browser) and the remote (webapplication) time in the style of the time circuits display of the DeLorean DMC-12 used in the movie 'Back to the future' as a time travel machine. In reference to this movie, the third line (Last departure time) is static and showing the respective time when Marty left 1985.">
+    <title>DeLorean Time Circuits</title>
+    <link href="https://fonts.cdnfonts.com/css/dseg14-classic" rel="stylesheet">
+    <style>
+        :root {
+            --red: #ff3232;
+            --green: #00ff41;
+            --orange: #ff9900;
+            --bg-color: #1a1a1a;
+            --panel-bg: #222;
+        }
+
+        body {
+            background-color: #000;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Container der das Seitenverhältnis hält */
+        .time-circuits-container {
+            width: 90vw;
+            max-width: 800px;
+            aspect-ratio: 16 / 9;
+            background-color: #333;
+            padding: 20px;
+            border: 10px solid #555;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .display-row {
+            background-color: var(--panel-bg);
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            border: 4px inset #444;
+        }
+
+        .label {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .time-values {
+            font-family: 'DSEG14 Classic', sans-serif;
+            font-style: italic;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: clamp(1.5rem, 5vw, 3.5rem);
+        }
+
+        /* Farben der Zeilen */
+        .destination .label { color: var(--red); }
+        .destination .time-values { color: var(--red); text-shadow: 0 0 10px var(--red); }
+
+        .present .label { color: var(--green); }
+        .present .time-values { color: var(--green); text-shadow: 0 0 10px var(--green); }
+
+        .departed .label { color: var(--orange); }
+        .departed .time-values { color: var(--orange); text-shadow: 0 0 10px var(--orange); }
+
+        .unit { display: flex; flex-direction: column; align-items: center; padding: 0px 3px;}
+        .unit-label { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: #aaa; font-style: normal; }
+    </style>
 </head>
 <body>
-<h1>Marty McFly Demo Application</h1>
+
+<div class="time-circuits-container">
+    <div class="display-row destination">
+        <div class="label">Destination Time (Container)</div>
+        <div class="time-values" id="container-display">
+            <div class="unit"><span id="dest-month">---</span>     <span class="unit-label">MONTH</span></div>
+            <div class="unit"><span id="dest-day"  >00</span>      <span class="unit-label">DAY</span></div>
+            <div class="unit"><span id="dest-year" >0000</span>    <span class="unit-label">YEAR</span></div>
+            <div class="unit"><span id="dest-time" >00:00:00</span><span class="unit-label">HOUR:MIN:SEC</span></div>
+        </div>
+    </div>
+
+    <div class="display-row present">
+        <div class="label">Present Time (Browser)</div>
+        <div class="time-values" id="browser-display">
+            <div class="unit"><span id="pres-month">---</span>     <span class="unit-label">MONTH</span></div>
+            <div class="unit"><span id="pres-day"  >00</span>      <span class="unit-label">DAY</span></div>
+            <div class="unit"><span id="pres-year" >0000</span>    <span class="unit-label">YEAR</span></div>
+            <div class="unit"><span id="pres-time" >00:00:00</span><span class="unit-label">HOUR:MIN:SEC</span></div>
+        </div>
+    </div>
+
+    <div class="display-row departed">
+        <div class="label">Last Time Departed</div>
+        <div class="time-values">
+            <div class="unit"><span>OCT</span>     <span class="unit-label">MONTH</span></div>
+            <div class="unit"><span>26</span>      <span class="unit-label">DAY</span></div>
+            <div class="unit"><span>1985</span>    <span class="unit-label">YEAR</span></div>
+            <div class="unit"><span>01:35:00</span><span class="unit-label">HOUR:MIN:SEC</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+    function formatTime(date) {
+        const h = String(date.getHours()  ).padStart(2, '0');
+        const m = String(date.getMinutes()).padStart(2, '0');
+        const s = String(date.getSeconds()).padStart(2, '0');
+        return `${h}:${m}:${s}`;
+    }
+
+    function updateDisplay(prefix, date) {
+        document.getElementById(`${prefix}-month`).textContent = monthNames[date.getMonth()];
+        document.getElementById(`${prefix}-day`).textContent = String(date.getDate()).padStart(2, '0');
+        document.getElementById(`${prefix}-year`).textContent = date.getFullYear();
+        document.getElementById(`${prefix}-time`).textContent = formatTime(date);
+    }
+
+    // Funktion zum Abrufen der Container-Zeit
+    async function fetchContainerTime() {
+        try {
+            const response = await fetch('/data');
+            const data = await response.json();
+            // Wir nutzen "iso", da das Date-Objekt dies direkt parsen kann
+            const containerDate = new Date(data.iso);
+            updateDisplay('dest', containerDate);
+        } catch (error) {
+            console.error("Fehler beim Abrufen der Container-Zeit:", error);
+        }
+    }
+
+    // Funktion für die Browser-Zeit
+    function updateBrowserTime() {
+        const now = new Date();
+        updateDisplay('pres', now);
+    }
+
+    // Intervalle setzen
+    setInterval(updateBrowserTime, 1000);
+    setInterval(fetchContainerTime, 1000);
+
+    // Initialer Aufruf
+    updateBrowserTime();
+    fetchContainerTime();
+</script>
+
 </body>
-</hml>
+</html>
