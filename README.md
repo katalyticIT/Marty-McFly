@@ -37,7 +37,9 @@ DMC-12 in the movie "[Back to the future](https://en.wikipedia.org/wiki/Back_to_
 Responds with a JSON record containing
 * the current time as ISO datestamp and as seconds since January 1st 1970
 * as well as the content of the environment variables LD_PRELOAD and FAKETIME (if set).
+
 Example:
+
 ```
 {
   "date": {
@@ -54,13 +56,13 @@ The main page uses this to retrieve the time from inside the container.
 
 ## Time travel
 
-The key to time travel for containers is libfaketime. It gets _preloaded_ via
-the environment variable *LD_PRELOAD* and thus gets places between the application
+The key to time travel for containers is **libfaketime**. It gets _preloaded_ via
+the environment variable **LD_PRELOAD** and thus gets placed between the application
 and the kernel, where it intercepts several system calls and is therefor able to
 manipulate the time for the calling process.
 
 The amount of time delta or the point in time gets passed to the library by the
-environment variable *FAKETIME*. In short it may contain three types of values:
+environment variable **FAKETIME**. In short it may contain three types of values:
 * _A time delta value_ in seconds, hours (h), days (d) or years (y). You could
   simulate a different timezone with "-12h" or test the same day one year ahead with "+365d".
 * _A start time_ where the "internal clock" starts ticking, like "FAKETIME='@2026-12-31 23:59:00'"
@@ -68,6 +70,9 @@ environment variable *FAKETIME*. In short it may contain three types of values:
   your programme calculates all balances correctly on New Year's Day.
 * _A fixed point in time_ like "1985-10-26 01:20:00". For the application the clock stays at
   that point in time.
+
+There's a lot more what libfaketime cando. Read more about it [here](https://github.com/wolfcw/libfaketime).
+.
 
 ### Example
 Assuming the application was built in an image named and tagged martymcfly:1.0.
