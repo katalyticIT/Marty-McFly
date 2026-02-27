@@ -12,3 +12,13 @@ The application itself is just a python application simply showing
 the time inside the container.
 
 
+## Routes
+
+### /data
+Gives the current time as ISO datestamp and as seconfs sind 01.01.1970
+in a JSON record. Example:
+```
+{"iso":"2026-02-27T16:39:29+00:00","epoch":1772210369}
+```
+
+
