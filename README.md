@@ -19,6 +19,8 @@ The main page shows three lines of date and time in the style like
 Emmett "Doc" Brown used them for the "time circuits" in his DeLoream
 DMC-12 in the movie "[Back to the future](https://en.wikipedia.org/wiki/Back_to_the_Future)" from 1985:
 
+![Picture of the three time circuit displays](img/timecurcuits.png)
+
 * The top line ("Destination time") shows the time of the web application,
   means the time inside the container.
 * The middle line ("Present time") displays the time of the browser (which

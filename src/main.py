@@ -17,6 +17,7 @@ from   fastapi.staticfiles import StaticFiles
 import uvicorn
 import datetime
 import logging
+import os
 
 #== Setup und configuration ========
 app = FastAPI()
@@ -48,9 +49,18 @@ async def data():
   datetime_iso   = datetime_now.isoformat(timespec='seconds')
   datetime_epoch = int(datetime_now.timestamp())
 
+  env_FAKETIME   = os.getenv("FAKETIME","")
+  env_LD_PRELOAD = os.getenv("LD_PRELOAD","")
+
   return {
-    "iso":   datetime_iso,
-    "epoch": datetime_epoch
+    "date": {
+      "iso":        datetime_iso,
+      "epoch":      datetime_epoch,
+    },
+    "env": {
+      "FAKETIME":   env_FAKETIME,
+      "LD_PRELOAD": env_LD_PRELOAD
+    }
   }
 
 
