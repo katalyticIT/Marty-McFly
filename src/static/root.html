@@ -131,9 +131,9 @@
 
     function updateDisplay(prefix, date) {
         document.getElementById(`${prefix}-month`).textContent = monthNames[date.getMonth()];
-        document.getElementById(`${prefix}-day`).textContent = String(date.getDate()).padStart(2, '0');
-        document.getElementById(`${prefix}-year`).textContent = date.getFullYear();
-        document.getElementById(`${prefix}-time`).textContent = formatTime(date);
+        document.getElementById(`${prefix}-day`  ).textContent = String(date.getDate()).padStart(2, '0');
+        document.getElementById(`${prefix}-year` ).textContent = date.getFullYear();
+        document.getElementById(`${prefix}-time` ).textContent = formatTime(date);
     }
 
     // Funktion zum Abrufen der Container-Zeit
@@ -141,8 +141,8 @@
         try {
             const response = await fetch('/data');
             const data = await response.json();
-            // Wir nutzen "iso", da das Date-Objekt dies direkt parsen kann
-            const containerDate = new Date(data.iso);
+            // Wir nutzen den Wert "iso", da das Date-Objekt dies direkt parsen kann
+            const containerDate = new Date(data.date.iso);
             updateDisplay('dest', containerDate);
         } catch (error) {
             console.error("Fehler beim Abrufen der Container-Zeit:", error);
@@ -156,7 +156,7 @@
     }
 
     // Intervalle setzen
-    setInterval(updateBrowserTime, 1000);
+    setInterval(updateBrowserTime,  1000);
     setInterval(fetchContainerTime, 1000);
 
     // Initialer Aufruf
