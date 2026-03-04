@@ -14,6 +14,10 @@ of the container and its descendants.
 The application itself is just a python/javascript application
 simply showing the time inside the container.
 
+## Licensing
+
+This software is published under the GNU General Public License v3.0.
+Please find details in the LICENSE file.
 
 ## Routes
 
