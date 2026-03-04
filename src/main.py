@@ -4,6 +4,9 @@
   Shows the time inside the container. Purpose is to let the container travel in
   time later by using libfaketime (https://github.com/wolfcw/libfaketime).
 
+  This software is published under the GNU General Public License v3.0. Find
+  the repository at https://github.com/katalyticIT/Marty-McFly/ .
+
 """
 
 #== configuration ========

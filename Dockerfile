@@ -1,6 +1,6 @@
 #
 # Dockerfile to build Marty McFly Demo Application
-# (showcase for moving containers in time=
+# (showcase for moving containers in time)
 # 
 
 FROM python:3.14-slim
