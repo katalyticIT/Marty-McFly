@@ -1,7 +1,10 @@
 
 # Marty-McFly
 
-Demo Application about timetravelling for containers
+Demo Application about timetravelling for containers.
+
+Addition for Technies: The trick is to insert libfaketime via
+the environment variable LD_PRELOAD.
 
 ## About
 
@@ -14,12 +17,40 @@ of the container and its descendants.
 The application itself is just a python/javascript application
 simply showing the time inside the container.
 
+In this demo the library is already in the image, just to make
+things easier. It's also possible to insert it via an
+init container - which makes it possible to shift containers
+through time *without making changes to code, app or image!*
+
 ![Libfaketime is the DeLorean for containers.](img/Delorean_Libfaketime_Container.jpg)
 
 ## Licensing
 
 This software is published under the GNU General Public License v3.0.
 Please find details in the LICENSE file.
+
+## How it works
+
+When starting the pod, kubernetes looks up the defined environment
+variables in the deployment desciption and set them. Placing the
+path to libfaketime (which is in the image already) in the variable
+**LD_PRELOAD**, the dynamic loader is loading the library *before*
+the app is starting.
+
+That way libfaketime sits *between* app and kernel where it intercepts
+system calls related to time requests, so that it canmodify them.
+
+Another environment variable **FAKETIME** controls the behaviour of
+libfaketime. It may contain a *relative time offset* ("+42h"),
+a timestamp to *start* the clock at ("@2015-10-21 16:29:00")
+or a timestamp to *freeze* the clock at ("2015-10-21T16:29:27+00:00").
+Now everytime the app asks the kernel about the time, it gets a
+modified answer. 
+
+The main html page of the Marty app displays the time *inside* the
+container in the top row, by asking the app every one second.
+The data is available via a simple API at /data, presenting
+the time and the libfaketime env vars in a simple JSON record.
 
 ## Routes
 
