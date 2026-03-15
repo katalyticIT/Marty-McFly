@@ -1,7 +1,10 @@
 
 # Marty-McFly
 
-Demo Application about timetravelling for containers
+Demo Application about timetravelling for containers.
+
+Addition for Technies: The trick is to insert libfaketime via
+the environment variable LD_PRELOAD.
 
 ## About
 
@@ -11,13 +14,46 @@ to preload [libfaketime](https://github.com/wolfcw/libfaketime)
 and to let this library do the time offset for the main process
 of the container and its descendants.
 
-The application itself is just a python/javascript application
-simply showing the time inside the container.
+In this demo the library is already in the image, just to make
+things easier. It's also possible to insert it via an
+init container - which makes it possible to shift containers
+through time *without making changes to code, app or image!*
+
+The application itself is a python script serving the (inside)
+time as JSON record at /data and a html/javascript browser
+application simply displaying that time plus the actual
+real time in the look of the time line displays Doc Brown
+used in his DeLorean in the movie "Back to the future".
+
+![Libfaketime is the DeLorean for containers.](img/Delorean_Libfaketime_Container.jpg)
 
 ## Licensing
 
 This software is published under the GNU General Public License v3.0.
 Please find details in the LICENSE file.
+
+## How it works
+
+When starting the pod, kubernetes looks up the defined environment
+variables in the deployment desciption and set them. Placing the
+path to libfaketime (which is in the image already) in the variable
+**LD_PRELOAD**, the dynamic loader is loading the library *before*
+the app is starting.
+
+That way libfaketime sits *between* app and kernel where it intercepts
+system calls related to time requests, so that it canmodify them.
+
+Another environment variable **FAKETIME** controls the behaviour of
+libfaketime. It may contain a *relative time offset* ("+42h"),
+a timestamp to *start* the clock at ("@2015-10-21 16:29:00")
+or a timestamp to *freeze* the clock at ("2015-10-21T16:29:27+00:00").
+Now everytime the app asks the kernel about the time, it gets a
+modified answer. 
+
+The main html page of the Marty app displays the time *inside* the
+container in the top row, by asking the app every one second.
+The data is available via a simple API at /data, presenting
+the time and the libfaketime env vars in a simple JSON record.
 
 ## Routes
 
@@ -78,7 +114,10 @@ environment variable **FAKETIME**. In short it may contain three types of values
 There's a lot more what libfaketime cando. Read more about it [here](https://github.com/wolfcw/libfaketime).
 .
 
-### Example
+## Examples
+
+### Docker
+
 Assuming the application was built in an image named and tagged martymcfly:1.0.
 You could let the application travel back to 2015 using the following docker
 command on your local machine:
@@ -86,5 +125,47 @@ command on your local machine:
 docker run --rm  -p 8080:8080 \
        --env=LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketimeMT.so.1 \
        --env=FAKETIME="@2015-10-21 16:29:00" \
-       martymcfly:1.0
+       katalytic/martymcfly:1.0
 ```
+
+### Kubernetes
+
+Use the file deployment.yaml to deploy marty on a kubernetes cluster. It starts
+one pod, listening on http/8080, and a service whichs listening on http/80.
+You have to install an ingress, coupling it with the service, according to the
+needs of your cluster setup.
+
+If you're trying the setup on Killercoda, you may encounter a setup without
+ingress controller. Install a bare metal nginx then:
+
+```
+sudo apt install nginx -y
+```
+
+Modify the default host in /etc/nginx/sites-enabled/default to
+forward it to the IP of the marty service:
+
+```
+  location / {
+    proxy_pass  http://10.99.149.179 ;
+  }
+```
+
+(Re)load the nginx configuration:
+
+```
+sudo systemctl reload nginx.service
+```
+
+Now click on the burger button to the right, open the traffic/ports
+page and there click on the "80" button. A page with the marty app
+mainpage opens, displaying the time in- and outside.
+
+## AI notice
+
+The html/javascipt mainpage of the Marty app was made using AI (Gemini).
+
+## Author
+This software was brought to you by katalytic IT. Visit our
+website at https://www.katalytic-it.com .
+
