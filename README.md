@@ -14,6 +14,8 @@ of the container and its descendants.
 The application itself is just a python/javascript application
 simply showing the time inside the container.
 
+![Libfaketime is the DeLorean for containers.](img/Delorean_Libfaketime_Container.jpg)
+
 ## Licensing
 
 This software is published under the GNU General Public License v3.0.
@@ -78,7 +80,10 @@ environment variable **FAKETIME**. In short it may contain three types of values
 There's a lot more what libfaketime cando. Read more about it [here](https://github.com/wolfcw/libfaketime).
 .
 
-### Example
+## Examples
+
+### Docker
+
 Assuming the application was built in an image named and tagged martymcfly:1.0.
 You could let the application travel back to 2015 using the following docker
 command on your local machine:
@@ -86,5 +91,39 @@ command on your local machine:
 docker run --rm  -p 8080:8080 \
        --env=LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketimeMT.so.1 \
        --env=FAKETIME="@2015-10-21 16:29:00" \
-       martymcfly:1.0
+       katalytic/martymcfly:1.0
 ```
+
+### Kubernetes
+
+Use the file deployment.yaml to deploy marty on a kubernetes cluster. It starts
+one pod, listening on http/8080, and a service whichs listening on http/80.
+You have to install an ingress, coupling it with the service, according to the
+needs of your cluster setup.
+
+If you're trying the setup on Killercoda, you may encounter a setup without
+ingress controller. Install a bare metal nginx then:
+
+```
+sudo apt install nginx -y
+```
+
+Modify the default host in /etc/nginx/sites-enabled/default to
+forward it to the IP of the marty service:
+
+```
+  location / {
+    proxy_pass  http://10.99.149.179 ;
+  }
+```
+
+(Re)load the nginx configuration:
+
+```
+sudo systemctl reload nginx.service
+```
+
+Now click on the burger button to the right, open the traffic/ports
+page and there click on the "80" button. A page with the marty app
+mainpage opens, displaying the time in- and outside.
+

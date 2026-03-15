@@ -1,0 +1,103 @@
+---
+# Sample kubernetes deployment - try e.g. on killercoda.com
+#
+# Deploy with:
+#
+# $ kubectl apply -f deployment.yaml
+#
+# After deployment of app & servcice, expose the deployment
+# via nodeport:
+#
+# $ kubectl expose deployment marty-depl --name marty-node  --type=NodePort --port=8080
+#
+# Check the nodeport to be used in your browser using:
+#
+# $ kubectl get service marty-node 
+#
+# Usually it should be assigned a port above 30000. Click on
+# the burger button in the top right corner and in the menu
+# choose 'Traffic/Ports'. Enter the nodeport number in the
+# box 'Custom Ports' and click 'Access' - the web application
+# opens in a new tab.
+#
+# Play around with the settings for FAKETIME. Examples for
+# possible values:
+# - "@2015-10-21 16:29:00" - starting "@" point in time
+# - "1999-12-31 23:59:59"  - fixed time, clock "not running"
+# - "+1234d" or "-3333h"   - relative offset to realtime
+#
+#----
+#
+# Note on Killercoda should you try the deployment there:
+# Maybe you can't access the app from outside because the
+# ingress ctrl is missing. On killercoda you can install
+# a bare metal nginx by yourself and change the directive
+# for "/" to a location, forwarding to the IP address of
+# the marty service:
+#
+#  location / {
+#    proxy_pass  http://${IP address of the marty service} ;
+#  }
+#
+# Another possibility is to define a nodeport and route
+# traffic there:
+#
+# location / {
+#    proxy_pass http://127.0.0.1:30080;
+#    proxy_set_header Host $host;
+#    proxy_set_header X-Real-IP $remote_addr;
+# }
+#
+#----
+
+# app deployment
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: marty-depl
+  labels:
+    app: marty
+
+spec:
+  selector:
+    matchLabels:
+      app: marty
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: marty
+    spec:
+      containers:
+        - name:  marty
+          image: katalytic/martymcfly:1.0
+          ports:
+            - containerPort: 8080
+
+          env:
+            - name: LD_PRELOAD
+              value: /usr/lib/x86_64-linux-gnu/faketime/libfaketimeMT.so.1
+            - name: FAKETIME
+              value: "@2015-10-21 16:29:00"      #-- starting at point in time
+              #value: "1999-12-31 23:59:59"      #-- standing still at point in time
+              #value: "+123d"                    #-- relative offset to realtime
+
+---
+# service
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: marty
+
+spec:
+  type: ClusterIP
+  selector:
+    app: marty
+  ports:
+    - port: 80
+      targetPort: 8080
+
+
