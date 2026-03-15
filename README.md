@@ -14,13 +14,16 @@ to preload [libfaketime](https://github.com/wolfcw/libfaketime)
 and to let this library do the time offset for the main process
 of the container and its descendants.
 
-The application itself is just a python/javascript application
-simply showing the time inside the container.
-
 In this demo the library is already in the image, just to make
 things easier. It's also possible to insert it via an
 init container - which makes it possible to shift containers
 through time *without making changes to code, app or image!*
+
+The application itself is a python script serving the (inside)
+time as JSON record at /data and a html/javascript browser
+application simply displaying that time plus the actual
+real time in the look of the time line displays Doc Brown
+used in his DeLorean in the movie "Back to the future".
 
 ![Libfaketime is the DeLorean for containers.](img/Delorean_Libfaketime_Container.jpg)
 
@@ -157,4 +160,12 @@ sudo systemctl reload nginx.service
 Now click on the burger button to the right, open the traffic/ports
 page and there click on the "80" button. A page with the marty app
 mainpage opens, displaying the time in- and outside.
+
+## AI notice
+
+The html/javascipt mainpage of the Marty app was made using AI (Gemini).
+
+## Author
+This software was brought to you by katalytic IT. Visit our
+website at https://www.katalytic-it.com .
 
