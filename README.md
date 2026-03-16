@@ -3,7 +3,7 @@
 
 Demo Application about timetravelling for containers.
 
-Addition for Technies: The trick is to insert libfaketime via
+Addition for Techies: The trick is to insert libfaketime via
 the environment variable LD_PRELOAD.
 
 ## About
@@ -14,9 +14,9 @@ to preload [libfaketime](https://github.com/wolfcw/libfaketime)
 and to let this library do the time offset for the main process
 of the container and its descendants.
 
-In this demo the library is already in the image, just to make
+In this demo the image is already containing the library, just to make
 things easier. It's also possible to insert it via an
-init container - which makes it possible to shift containers
+init container - which makes it possible to shift nearly every container
 through time *without making changes to code, app or image!*
 
 The application itself is a python script serving the (inside)
@@ -32,10 +32,12 @@ used in his DeLorean in the movie "Back to the future".
 This software is published under the GNU General Public License v3.0.
 Please find details in the LICENSE file.
 
+The images in the folder img/ are licensed under CC BY-NC-SA.
+
 ## How it works
 
 When starting the pod, kubernetes looks up the defined environment
-variables in the deployment desciption and set them. Placing the
+variables in the deployment desciption and sets them. Placing the
 path to libfaketime (which is in the image already) in the variable
 **LD_PRELOAD**, the dynamic loader is loading the library *before*
 the app is starting.
@@ -54,6 +56,19 @@ The main html page of the Marty app displays the time *inside* the
 container in the top row, by asking the app every one second.
 The data is available via a simple API at /data, presenting
 the time and the libfaketime env vars in a simple JSON record.
+
+## When it does not work
+
+There're a couple of cases where this trick doesn't work, for example:
+
+* The underlying image is not based on glibc. E.g. the alpine is based
+  on [musl libc](https://musl.libc.org/) so the libfaketime library
+  won't work here.
+* The target binary is linked statically, e.g. compiled go binaries.
+  These don't work via glibc so they bypass libfaketime library.
+
+However, everyday experience with containers shows that in the vast
+majority of cases, manipulating the time using `libfaketime` works.
 
 ## Routes
 
@@ -111,16 +126,15 @@ environment variable **FAKETIME**. In short it may contain three types of values
 * _A fixed point in time_ like "1985-10-26 01:20:00". For the application the clock stays at
   that point in time.
 
-There's a lot more what libfaketime cando. Read more about it [here](https://github.com/wolfcw/libfaketime).
-.
+There's a lot more what libfaketime can do. Read more about it [here](https://github.com/wolfcw/libfaketime).
 
 ## Examples
 
 ### Docker
 
-Assuming the application was built in an image named and tagged martymcfly:1.0.
-You could let the application travel back to 2015 using the following docker
+Here's how you could let the application travel back to 2015 using the following docker
 command on your local machine:
+
 ```
 docker run --rm  -p 8080:8080 \
        --env=LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketimeMT.so.1 \
@@ -131,9 +145,10 @@ docker run --rm  -p 8080:8080 \
 ### Kubernetes
 
 Use the file deployment.yaml to deploy marty on a kubernetes cluster. It starts
-one pod, listening on http/8080, and a service whichs listening on http/80.
-You have to install an ingress, coupling it with the service, according to the
-needs of your cluster setup.
+one pod, listening on http/8080, and a service which is listening on http/80.
+To access the app from the outside world,
+you'll have to install an ingress according to the needs of your cluster setup
+and the link it to the marty service.
 
 If you're trying the setup on Killercoda, you may encounter a setup without
 ingress controller. Install a bare metal nginx then:
@@ -143,11 +158,12 @@ sudo apt install nginx -y
 ```
 
 Modify the default host in /etc/nginx/sites-enabled/default to
-forward it to the IP of the marty service:
+forward it to the IP of the endpoint which you may find in the
+marty service:
 
 ```
   location / {
-    proxy_pass  http://10.99.149.179 ;
+    proxy_pass  http://${IP of the endpoint listed in the marty service} ;
   }
 ```
 
@@ -157,9 +173,9 @@ forward it to the IP of the marty service:
 sudo systemctl reload nginx.service
 ```
 
-Now click on the burger button to the right, open the traffic/ports
+Now click on the burger button to the upper right, open the traffic/ports
 page and there click on the "80" button. A page with the marty app
-mainpage opens, displaying the time in- and outside.
+mainpage opens, displaying the time "inside and outside".
 
 ## AI notice
 
