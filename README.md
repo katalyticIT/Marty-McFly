@@ -3,7 +3,7 @@
 
 Demo Application about timetravelling for containers.
 
-Addition for Technies: The trick is to insert libfaketime via
+Addition for Techies: The trick is to insert libfaketime via
 the environment variable LD_PRELOAD.
 
 ## About
@@ -14,9 +14,9 @@ to preload [libfaketime](https://github.com/wolfcw/libfaketime)
 and to let this library do the time offset for the main process
 of the container and its descendants.
 
-In this demo the library is already in the image, just to make
+In this demo the image is already containing the library, just to make
 things easier. It's also possible to insert it via an
-init container - which makes it possible to shift containers
+init container - which makes it possible to shift nearly every container
 through time *without making changes to code, app or image!*
 
 The application itself is a python script serving the (inside)
@@ -126,8 +126,7 @@ environment variable **FAKETIME**. In short it may contain three types of values
 * _A fixed point in time_ like "1985-10-26 01:20:00". For the application the clock stays at
   that point in time.
 
-There's a lot more what libfaketime cando. Read more about it [here](https://github.com/wolfcw/libfaketime).
-.
+There's a lot more what libfaketime can do. Read more about it [here](https://github.com/wolfcw/libfaketime).
 
 ## Examples
 
@@ -135,6 +134,7 @@ There's a lot more what libfaketime cando. Read more about it [here](https://git
 
 Here's how you could let the application travel back to 2015 using the following docker
 command on your local machine:
+
 ```
 docker run --rm  -p 8080:8080 \
        --env=LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketimeMT.so.1 \
