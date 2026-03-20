@@ -87,13 +87,15 @@ DMC-12 in the movie "[Back to the future](https://en.wikipedia.org/wiki/Back_to_
 * The bottom line is static and shows Marty McFlys departure time from
   the year 1985 after the Lybian terrorist attack.
 
-### /data
+### /data/[json,xml,yaml]
 
-Responds with a JSON record containing
+Responds with a data record in the respective data format containing 
 * the current time as ISO datestamp and as seconds since January 1st 1970
 * as well as the content of the environment variables LD_PRELOAD and FAKETIME (if set).
 
-Example:
+These can be useful when using the image for time travel tests.
+The basic record is a dictionary containing data as can be seen in the
+json record:
 
 ```
 {
@@ -107,7 +109,8 @@ Example:
   }
 }
 ```
-The main page uses this to retrieve the time from inside the container.
+/data/yaml and /data/xml follow the same path in their own schema.
+The main page uses /data/json to retrieve the time from inside the container.
 
 ## Time travel
 

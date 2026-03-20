@@ -120,6 +120,7 @@
 </div>
 
 <script>
+    const pathToData = "/data/json";
     const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
     function formatTime(date) {
@@ -139,7 +140,7 @@
     // Funktion zum Abrufen der Container-Zeit
     async function fetchContainerTime() {
         try {
-            const response = await fetch('/data');
+            const response = await fetch(pathToData);
             const data = await response.json();
             // Wir nutzen den Wert "iso", da das Date-Objekt dies direkt parsen kann
             const containerDate = new Date(data.date.iso);

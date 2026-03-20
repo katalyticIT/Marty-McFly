@@ -14,13 +14,16 @@ MARTY_HOST = "0.0.0.0"
 MARTY_PORT = 8080
 
 #== load libraries ========
-from   fastapi             import FastAPI, Request
+from   fastapi             import FastAPI, Request, Response
 from   fastapi.responses   import HTMLResponse
 from   fastapi.staticfiles import StaticFiles
+from   dicttoxml           import dicttoxml
 import uvicorn
 import datetime
 import logging
+import yaml
 import os
+
 
 #== Setup und configuration ========
 app = FastAPI()
@@ -45,9 +48,8 @@ def root():
     html = "Error reading root.html"
   return html
 
-#-- json data output
-@app.get("/data")
-async def data():
+#-- fill data record
+def getData():
   datetime_now   = datetime.datetime.now(datetime.timezone.utc)
   datetime_iso   = datetime_now.isoformat(timespec='seconds')
   datetime_epoch = int(datetime_now.timestamp())
@@ -65,6 +67,22 @@ async def data():
       "LD_PRELOAD": env_LD_PRELOAD
     }
   }
+
+#-- json data output
+@app.get("/data/json")
+async def data_json():
+  # FastAPI automatically converts dict to JSON
+  return getData()
+
+#-- yaml data output
+@app.get("/data/yaml")
+async def data_yaml():
+  return Response(content=yaml.dump(getData()), media_type="application/x-yaml")
+
+#-- yaml data output
+@app.get("/data/xml")
+async def data_xml():
+  return Response(content=dicttoxml(getData()), media_type="application/xml")
 
 
 #== main() ========
