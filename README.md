@@ -89,9 +89,10 @@ DMC-12 in the movie "[Back to the future](https://en.wikipedia.org/wiki/Back_to_
 
 ### /data/[json,xml,yaml]
 
-Responds with a data record in the respective data format containing 
+Responds with a data record in the respective data format containing :
 * the current time as ISO datestamp and as seconds since January 1st 1970
-* as well as the content of the environment variables LD_PRELOAD and FAKETIME (if set).
+* the uptime of the process (and thus pod) in seconds
+* the content of the environment variables LD_PRELOAD and FAKETIME (if set; else empty).
 
 These can be useful when using the image for time travel tests.
 The basic record is a dictionary containing data as can be seen in the
@@ -100,8 +101,9 @@ json record:
 ```
 {
   "date": {
-    "iso":"2015-10-21T16:29:27+00:00",
-    "epoch":1445444967
+    "iso":"2015-10-21T16:29:42+00:00",
+    "epoch":1445444967,
+    "uptime": 42
   },
   "env": {
     "FAKETIME":"@2015-10-21 16:29:00",
@@ -182,7 +184,7 @@ mainpage opens, displaying the time "inside and outside".
 
 ## AI notice
 
-The html/javascipt mainpage of the Marty app was made using AI (Gemini).
+The html/javascipt main page of the Marty app was made using AI (Gemini).
 
 ## Author
 This software was brought to you by katalytic IT. Visit our

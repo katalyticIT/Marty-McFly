@@ -24,6 +24,8 @@ import logging
 import yaml
 import os
 
+# global value to store start time of webserver; gets used to calculate uptime
+startTime = datetime.datetime.now(datetime.timezone.utc).timestamp()
 
 #== Setup und configuration ========
 app = FastAPI()
@@ -48,11 +50,18 @@ def root():
     html = "Error reading root.html"
   return html
 
+#-- get process uptime <=> pod uptime
+def getUptime(now):
+  global startTime
+  return int(now - startTime)
+
 #-- fill data record
 def getData():
   datetime_now   = datetime.datetime.now(datetime.timezone.utc)
   datetime_iso   = datetime_now.isoformat(timespec='seconds')
   datetime_epoch = int(datetime_now.timestamp())
+
+  uptime = getUptime(datetime_epoch)    # retrieve uptime in seconds
 
   env_FAKETIME   = os.getenv("FAKETIME","")
   env_LD_PRELOAD = os.getenv("LD_PRELOAD","")
@@ -61,6 +70,7 @@ def getData():
     "date": {
       "iso":        datetime_iso,
       "epoch":      datetime_epoch,
+      "uptime":     uptime
     },
     "env": {
       "FAKETIME":   env_FAKETIME,
