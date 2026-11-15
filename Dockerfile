@@ -3,7 +3,12 @@
 # (showcase for moving containers in time)
 # 
 
-FROM python:3.14-slim
+ARG BASEIMG=python
+ARG BASETAG=3.14-slim
+
+#----
+
+FROM $BASEIMG:$BASETAG
 
 # updates for basic image, then install libfaketime
 RUN  apt-get upgrade && apt-get update
